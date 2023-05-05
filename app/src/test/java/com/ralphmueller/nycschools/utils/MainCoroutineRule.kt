@@ -3,9 +3,8 @@ package com.ralphmueller.nycschools.utils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineExceptionHandler
 import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.createTestCoroutineScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -16,7 +15,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 @ExperimentalCoroutinesApi
 class MainCoroutineRule : TestWatcher(), TestCoroutineScope by createTestCoroutineScope(
-    TestCoroutineDispatcher() + TestCoroutineExceptionHandler() + EmptyCoroutineContext
+    UnconfinedTestDispatcher() + EmptyCoroutineContext
 ) {
 
     override fun starting(description: Description?) {

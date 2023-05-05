@@ -26,6 +26,7 @@ class SchoolRepo(
                 is Result.Success -> {
                     emit(Result.Success(schools.data))
                 }
+
                 else -> {}
             }
             var dataChanged = false
