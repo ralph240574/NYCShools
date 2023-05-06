@@ -6,7 +6,7 @@ import com.ralphmueller.nycschools.data.remote.model.RDSchool
 
 
 class NYCSchoolsRemoteDataSource(
-    private val nYCSchoolsRemoteService: NYCSchoolsRemoteService
+    private val nYCSchoolsRemoteService: NYCSchoolsRemoteService,
 ) {
 
     suspend fun getNycSchools(): Result<List<RDSchool>> =
@@ -21,7 +21,7 @@ class NYCSchoolsRemoteDataSource(
                 } else if (response.code() == 304) {
                     return@safeApiCall Result.Success(emptyList())
                 }
-                Result.Error(Exception("Something is wrong :${response.body()}"))
+                Result.Error(Exception(response.message()))
             })
 
     suspend fun getNycSats(): Result<List<RDSAT>> =
@@ -38,5 +38,4 @@ class NYCSchoolsRemoteDataSource(
                 }
                 return@safeApiCall Result.Error(Exception("Something is wrong :${response.body()}"))
             })
-
 }

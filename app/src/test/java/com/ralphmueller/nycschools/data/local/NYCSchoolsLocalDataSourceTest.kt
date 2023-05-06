@@ -27,24 +27,16 @@ class NYCSchoolsLocalDataSourceTest {
 
     @Before
     fun createRepository() {
-
         database = Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext(),
             LocalDataBase::class.java
         ).allowMainThreadQueries().build()
 
         localDataSource = NYCSchoolsLocalDataSource(database = database)
-
-//        runBlocking {
-//            batchItems.forEachIndexed { index, it ->
-//                localBatchCountDataSource.insertBatchItem(it, index)
-//            }
-//        }
     }
 
     @After
     fun closeDb() = database.close()
-
 
     @Test
     fun insertLocalSchool() = runTest(UnconfinedTestDispatcher()) {
@@ -112,4 +104,14 @@ class NYCSchoolsLocalDataSourceTest {
 
     }
 
+    fun getSchool() = runTest(UnconfinedTestDispatcher()) {
+        localDataSource.insertLocalSchool(localSchool = localSchool)
+
+        localDataSource.insertLocalSAT(localSAT = localSAT)
+
+        val result = localDataSource.getSchool(dbn = localSchool.dbn)
+        val data = (result as Result.Success).data
+
+        assertThat(data).isEqualTo(localSchool.toSchool(localSAT = localSAT))
+    }
 }

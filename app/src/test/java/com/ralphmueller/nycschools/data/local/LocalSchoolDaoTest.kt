@@ -46,6 +46,13 @@ class LocalSchoolDaoTest {
     }
 
     @Test
+    fun `should get school`() = runTest(UnconfinedTestDispatcher()) {
+        database.localSchoolDao().insertLocalSchool(localSchool)
+        val loaded = database.localSchoolDao().getLocalSchool(localSchool.dbn)
+        assertThat(loaded).isEqualTo(localSchool)
+    }
+
+    @Test
     fun `should insert multiple school`() = runTest(UnconfinedTestDispatcher()) {
         database.localSchoolDao().insertLocalSchool(localSchool)
         database.localSchoolDao().insertLocalSchool(localSchool.copy(dbn = "2"))

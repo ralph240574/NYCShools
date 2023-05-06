@@ -35,5 +35,12 @@ class NYCSchoolsLocalDataSource(val database: LocalDataBase) {
         return Result.Success(data = schools)
     }
 
+    suspend fun getSchool(dbn: String): Result<School> {
+        val localSchool = database.localSchoolDao().getLocalSchool(dbn = dbn)
+        val sat = database.localSATDao().getLocalSAT(dbn = dbn)
+        val school = localSchool.toSchool(sat)
+        return Result.Success(data = school)
+
+    }
 
 }

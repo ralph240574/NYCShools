@@ -14,7 +14,7 @@ interface NYCSchoolsRemoteService {
     suspend fun getNYCSchools(): Response<List<RDSchool>>
 
     @Headers("Content-Type: application/json")
-    @GET("resource/s3k6-pzi2.json")
+    @GET("resource/f9bf-2cp4.json")
     suspend fun getNYCSATs(): Response<List<RDSAT>>
 
 }

@@ -16,47 +16,55 @@ class SchoolRepo(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
+    suspend fun getSchools(forceRefresh: Boolean = false): Flow<Result<List<School>>> =
 
-    suspend fun getSchools(): Flow<Result<List<School>>> =
         flow {
             emit(Result.Loading)
 
+            var noData = true
             when (val schools = localDataSource.getSchools()) {
                 is Result.Error -> throw schools.exception
                 is Result.Success -> {
+                    if (schools.data.isNotEmpty()) {
+                        noData = false
+                    }
                     emit(Result.Success(schools.data))
                 }
 
                 else -> {}
             }
+
             var dataChanged = false
-            when (val schools = remoteDataSource.getNycSchools()) {
-                is Result.Error -> throw schools.exception
-                is Result.Success -> {
-                    schools.data.forEach {
-                        localDataSource.insertLocalSchool(it.toLocalSchool())
-                        dataChanged = true
+            if (forceRefresh || noData) {
+                when (val schools = remoteDataSource.getNycSchools()) {
+                    is Result.Error -> throw schools.exception
+                    is Result.Success -> {
+                        schools.data.forEach {
+                            localDataSource.insertLocalSchool(it.toLocalSchool())
+                            dataChanged = true
+                        }
                     }
-                }
 
-                else -> {}
-            }
-            when (val sats = remoteDataSource.getNycSats()) {
-                is Result.Error -> throw sats.exception
-                is Result.Success -> {
-                    sats.data.forEach {
-                        localDataSource.insertLocalSAT(it.toLocalSAT())
-                        dataChanged = true
+                    else -> {}
+                }
+                when (val sats = remoteDataSource.getNycSats()) {
+                    is Result.Error -> throw sats.exception
+                    is Result.Success -> {
+                        sats.data.forEach {
+                            localDataSource.insertLocalSAT(it.toLocalSAT())
+                            dataChanged = true
+                        }
                     }
-                }
 
-                else -> {}
+                    else -> {}
+                }
             }
+
             if (dataChanged) {
                 when (val schools = localDataSource.getSchools()) {
                     is Result.Error -> throw schools.exception
                     is Result.Success -> {
-                        if (schools.data.size > 0) {
+                        if (schools.data.isNotEmpty()) {
                             emit(Result.Success(schools.data))
                         }
                     }
@@ -65,6 +73,24 @@ class SchoolRepo(
                 }
             }
 
+        }.flowOn(ioDispatcher)
+            .catch { exception ->
+                emit(Result.Error(exception))
+            }
+
+    suspend fun getSchool(dbn: String): Flow<Result<School>> =
+
+        flow {
+            emit(Result.Loading)
+
+            when (val school = localDataSource.getSchool(dbn = dbn)) {
+                is Result.Error -> throw school.exception
+                is Result.Success -> {
+                    emit(Result.Success(school.data))
+                }
+
+                else -> {}
+            }
         }.flowOn(ioDispatcher)
             .catch { exception ->
                 emit(Result.Error(exception))

@@ -61,7 +61,6 @@ class NYCSchoolsRemoteDataSourceTest {
         mockWebServer.shutdown()
     }
 
-
     @Test
     fun getSchools() {
         mockWebServer.enqueueResponse("nycschools.json", 200)
@@ -80,8 +79,8 @@ class NYCSchoolsRemoteDataSourceTest {
 
         runTest(UnconfinedTestDispatcher()) {
             val result = nycSchoolsRemoteDataSource.getNycSats()
-            val schools = (result as Result.Success).data
-            assertThat(schools.size).isEqualTo(478)
+            val sats = (result as Result.Success).data
+            assertThat(sats.size).isEqualTo(478)
         }
     }
 }

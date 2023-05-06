@@ -45,6 +45,13 @@ class LocalSATDaoTest {
     }
 
     @Test
+    fun `should get sat`() = runTest(UnconfinedTestDispatcher()) {
+        database.localSATDao().insertLocalSAT(localSAT)
+        val loaded = database.localSATDao().getLocalSAT(dbn = localSAT.dbn)
+        assertThat(loaded).isEqualTo(localSAT)
+    }
+
+    @Test
     fun `should insert multiple sats`() = runTest(UnconfinedTestDispatcher()) {
         database.localSATDao().insertLocalSAT(localSAT)
         database.localSATDao().insertLocalSAT(localSAT.copy(dbn = "2"))
