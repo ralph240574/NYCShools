@@ -66,12 +66,8 @@ fun NavGraph(
                 uiState = uiState,
                 loadSchoolData = detailViewModel::getSchool,
                 dbn = dbn,
-                navController = navController
+                popBackStack = navController::popBackStack
             )
         }
-
-//        composable("profile/{userId}") { backStackEntry ->
-//            Profile(navController, backStackEntry.arguments?.getString("userId"))
-//        }
     }
 }

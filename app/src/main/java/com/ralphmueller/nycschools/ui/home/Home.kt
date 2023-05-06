@@ -11,11 +11,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FabPosition
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -56,7 +62,20 @@ fun Home(
 
     Scaffold(
         scaffoldState = scaffoldState,
-        topBar = { TopAppBar(title = { Text("NYC School Data") }) },
+        topBar = {
+            TopAppBar(title = { Text("NYC School Data") },
+                actions = {
+                    IconButton(onClick = {/* Do Something*/ }) {
+                        Icon(Icons.Filled.Sort, null)
+                    }
+                    IconButton(onClick = {/* Do Something*/ }) {
+                        Icon(Icons.Filled.FilterList, null)
+                    }
+                    IconButton(onClick = {/* Do Something*/ }) {
+                        Icon(Icons.Filled.Search, null)
+                    }
+                })
+        },
         floatingActionButtonPosition = FabPosition.End
     ) { padding ->
         Box(Modifier.pullRefresh(state)) {
@@ -131,8 +150,8 @@ val school = School(
     phone_number = "212-524-4360",
     school_email = "admissions@theclintonschool.net",
     website = "www.theclintonschool.net",
-    num_of_sat_test_takers = "",
-    sat_critical_reading_avg_score = "",
-    sat_math_avg_score = "",
-    sat_writing_avg_score = ""
+    num_of_sat_test_takers = "123",
+    sat_critical_reading_avg_score = "50",
+    sat_math_avg_score = "100",
+    sat_writing_avg_score = "80"
 )

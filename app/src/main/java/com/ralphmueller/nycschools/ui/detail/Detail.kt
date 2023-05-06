@@ -11,38 +11,41 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import com.ralphmueller.nycschools.ui.home.school
 
+@Preview
 @Composable
 fun Detail(
-    uiState: DetailUiState,
-    loadSchoolData: (String) -> Unit,
+    uiState: DetailUiState = DetailUiState(school = school),
+    loadSchoolData: (String) -> Unit = {},
     dbn: String = "",
-    navController: NavController
+    popBackStack: () -> Unit = {}
 ) {
 
-//    val uiState by detailViewModel.uiState.collectAsState()
-
     LaunchedEffect(dbn) {
-        println("in launched effect: " + dbn)
         loadSchoolData(dbn)
     }
-
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("School Details") },
                 navigationIcon = {
-                    IconButton(onClick = navController::popBackStack) {
+                    IconButton(onClick = popBackStack) {
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
-                }
-            )
+                },
+                actions = {
+                    IconButton(onClick = {/* Do Something*/ }) {
+                        Icon(Icons.Filled.Share, null)
+                    }
+                })
         },
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
