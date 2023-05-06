@@ -12,9 +12,8 @@ object Destinations {
  * Models the navigation actions in the app.
  */
 class NavigationActions(navController: NavHostController) {
-
     val navigateToDetails: (String) -> Unit = {
-        println("${Destinations.DETAILS}/${it}")
+        println("Navigate  to ${Destinations.DETAILS}/${it}")
         navController.navigate(route = "${Destinations.DETAILS}/${it}") {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true

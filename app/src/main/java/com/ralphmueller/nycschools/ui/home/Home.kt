@@ -68,8 +68,8 @@ fun Home(
                 if (!refreshing) {
                     items(uiState.schools) { school ->
                         ListItem(
-                            school,
-                            { navigateToDetails(school.dbn) }
+                            school = school,
+                            onClick = { navigateToDetails(school.dbn) }
                         )
                     }
                 }
@@ -105,11 +105,7 @@ fun ListItem(
         modifier = Modifier
             .fillMaxSize()
             .height(IntrinsicSize.Max)
-            .selectable(
-                selected = true,
-                onClick = onClick,
-            )
-
+            .selectable(selected = true, onClick = onClick)
             .padding(10.dp)
     ) {
         Text(text = school.school_name)

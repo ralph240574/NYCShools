@@ -64,8 +64,9 @@ fun NavGraph(
 
             Detail(
                 uiState = uiState,
-                getSchool = detailViewModel::getSchool,
-                dbn = dbn
+                loadSchoolData = detailViewModel::getSchool,
+                dbn = dbn,
+                navController = navController
             )
         }
 
