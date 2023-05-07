@@ -31,7 +31,7 @@ class NYCSchoolsRemoteDataSourceTest {
     var cacheSize = 4 * 1024 * 1024
 
     var cache = Cache(
-        File(getApplication().getCacheDir(), "cache"),
+        File(getApplication().cacheDir, "cache"),
         cacheSize.toLong()
     )
 

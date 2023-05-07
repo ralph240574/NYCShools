@@ -42,10 +42,10 @@ data class RDSAT(
         return LocalSAT(
             dbn = dbn,
             school_name = school_name,
-            num_of_sat_test_takers = num_of_sat_test_takers ?: "",
-            sat_critical_reading_avg_score = sat_critical_reading_avg_score ?: "",
-            sat_math_avg_score = sat_math_avg_score ?: "",
-            sat_writing_avg_score = sat_writing_avg_score ?: ""
+            num_of_sat_test_takers = num_of_sat_test_takers,
+            sat_critical_reading_avg_score = sat_critical_reading_avg_score,
+            sat_math_avg_score = sat_math_avg_score,
+            sat_writing_avg_score = sat_writing_avg_score
         )
     }
 

@@ -1,27 +1,30 @@
 package com.ralphmueller.nycschools.ui.home
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -36,18 +39,29 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import com.ralphmueller.nycschools.model.School
 import kotlinx.coroutines.launch
+import timber.log.Timber
+
+const val SCHOOL_LIST = "SchoolList"
 
 @OptIn(ExperimentalMaterialApi::class)
+
 @Composable
 fun Home(
     uiState: HomeUiState,
     refreshSchools: (Boolean) -> Unit,
+    sortingBy: (SortingOption) -> Unit,
     onDismissError: () -> Unit,
     navigateToDetails: (String) -> Unit
 ) {
@@ -63,31 +77,47 @@ fun Home(
 
     val state = rememberPullRefreshState(refreshing, ::refresh)
 
+    val openSortDialog = remember { mutableStateOf(false) }
+
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(title = { Text("NYC School Data") },
                 actions = {
-                    IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.Sort, null)
-                    }
-                    IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.FilterList, null)
-                    }
-                    IconButton(onClick = {
-
-                    }) {
-                        Icon(Icons.Filled.Search, null)
+                    IconButton(onClick = { openSortDialog.value = true }) {
+                        Icon(Icons.Filled.Sort, "Sort")
                     }
                 })
         },
         floatingActionButtonPosition = FabPosition.End
     ) { padding ->
         Box(Modifier.pullRefresh(state)) {
+            if (openSortDialog.value) {
+                AlertDialog(
+                    onDismissRequest = { openSortDialog.value = false },
+                    title = { Text(text = "Sort By") },
+                    text = {
+                        SortingOptions(
+                            sortingBy = sortingBy,
+                            lastSorting = uiState.sortedBy
+                        )
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            openSortDialog.value = false
+                            sortingBy(uiState.sortedBy)
+                        }) {
+                            Text("OK")
+                        }
+                    }
+                )
+            }
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues = padding)
+                    .testTag(SCHOOL_LIST)
             ) {
                 if (!refreshing) {
                     items(uiState.schools) { school ->
@@ -134,17 +164,124 @@ fun ListItem(
     ) {
         Text(text = school.school_name)
         Text(text = school.location)
-        Text(text = school.website)
-
+        HyperlinkText(
+            fullText = school.website,
+            linkText = listOf(school.website),
+            hyperlinks = listOf("https://" + school.website)
+        )
+        Text(text = school.sat_critical_reading_avg_score)
+        Text(text = school.sat_writing_avg_score)
+        Text(text = school.sat_math_avg_score)
     }
 }
 
 @Preview
 @Composable
 fun PreviewHome(
-    uiState: HomeUiState = HomeUiState(schools = listOf(school, school))
+    uiState: HomeUiState = HomeUiState(
+        schools = listOf(school, school),
+        sortedBy = SortingOption.MATH_SCORE
+    )
 ) {
-    Home(uiState = uiState, {}, {}, {})
+    Home(uiState = uiState, {}, {}, {}, {})
+}
+
+@Composable
+fun SortingOptions(sortingBy: (SortingOption) -> Unit, lastSorting: SortingOption) {
+    val radioOptions = listOf(
+        SortingOption.READING_SCORE,
+        SortingOption.WRITING_SCORE,
+        SortingOption.MATH_SCORE
+    )
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(lastSorting) }
+    Column {
+        radioOptions.forEach { sortingBy ->
+            Row(Modifier
+                .fillMaxWidth()
+                .selectable(
+                    selected = (sortingBy == selectedOption),
+                    onClick = {
+                        onOptionSelected(sortingBy)
+                        sortingBy(sortingBy)
+                    }
+                )
+                .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = (sortingBy == selectedOption),
+                    onClick = {
+                        onOptionSelected(sortingBy)
+                        sortingBy(sortingBy)
+                    }
+                )
+                Text(
+                    text = sortingBy.toString()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun HyperlinkText(
+    modifier: Modifier = Modifier,
+    fullText: String,
+    linkText: List<String>,
+    linkTextColor: Color = Color.Blue,
+    linkTextFontWeight: FontWeight = FontWeight.Medium,
+    linkTextDecoration: TextDecoration = TextDecoration.Underline,
+    hyperlinks: List<String> = listOf(),
+    fontSize: TextUnit = TextUnit.Unspecified
+) {
+    val annotatedString = buildAnnotatedString {
+        append(fullText)
+        linkText.forEachIndexed { index, link ->
+            val startIndex = fullText.indexOf(link)
+            val endIndex = startIndex + link.length
+            addStyle(
+                style = SpanStyle(
+                    color = linkTextColor,
+                    fontSize = fontSize,
+                    fontWeight = linkTextFontWeight,
+                    textDecoration = linkTextDecoration
+                ),
+                start = startIndex,
+                end = endIndex
+            )
+            addStringAnnotation(
+                tag = "URL",
+                annotation = hyperlinks[index],
+                start = startIndex,
+                end = endIndex
+            )
+        }
+        addStyle(
+            style = SpanStyle(
+                fontSize = fontSize
+            ),
+            start = 0,
+            end = fullText.length
+        )
+    }
+
+    val uriHandler = LocalUriHandler.current
+
+    ClickableText(
+        modifier = modifier,
+        text = annotatedString,
+        onClick = {
+            try {
+                annotatedString
+                    .getStringAnnotations("URL", it, it)
+                    .firstOrNull()?.let { stringAnnotation ->
+                        uriHandler.openUri(stringAnnotation.item)
+                    }
+            } catch (ex: Exception) {
+                Timber.e(ex)
+            }
+        }
+    )
 }
 
 val school = School(

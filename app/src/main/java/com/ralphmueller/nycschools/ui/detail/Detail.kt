@@ -35,6 +35,7 @@ fun Detail(
         loadSchoolData(dbn)
     }
 
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -86,7 +87,6 @@ fun getShareText(school: School?): String {
     if (school == null) {
         return ""
     }
-    return school.school_name + "\n"+ school.website +"\n" +school.school_email
+    return school.school_name + "\n" + school.website + "\n" + school.school_email
 
 }
-

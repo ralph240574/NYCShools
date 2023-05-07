@@ -1,5 +1,6 @@
 package com.ralphmueller.nycschools.ui.home
 
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ralphmueller.nycschools.data.Result
@@ -19,18 +20,30 @@ import javax.inject.Inject
  */
 data class HomeUiState(
     val schools: List<School> = emptyList(),
+    val sortedBy: SortingOption,
     val loading: Boolean = false,
     val message: String? = null,
     val exception: Throwable? = null
 )
 
 
+enum class SortingOption(val pretty: String) {
+    READING_SCORE("Reading Score"),
+    WRITING_SCORE("Writing Score"),
+    MATH_SCORE("Math Score");
+
+    override fun toString(): String {
+        return pretty
+    }
+}
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     val schoolRepo: SchoolRepo
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState(loading = true))
+    private val _uiState =
+        MutableStateFlow(HomeUiState(loading = true, sortedBy = SortingOption.MATH_SCORE))
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
@@ -73,6 +86,35 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun sortBy(sortBy: SortingOption) {
+        when (sortBy) {
+            SortingOption.MATH_SCORE -> _uiState.update {
+                it.copy(
+                    schools = it.schools.filter { it.sat_math_avg_score.isDigitsOnly() }
+                        .sortedByDescending { it.sat_math_avg_score },
+                    sortedBy = SortingOption.MATH_SCORE
+                )
+            }
+
+            SortingOption.READING_SCORE -> _uiState.update {
+                it.copy(
+                    schools = it.schools.filter { it.sat_critical_reading_avg_score.isDigitsOnly() }
+                        .sortedByDescending { it.sat_critical_reading_avg_score },
+                    sortedBy = SortingOption.READING_SCORE
+                )
+            }
+
+            SortingOption.WRITING_SCORE -> _uiState.update {
+                it.copy(
+                    schools = it.schools.filter { it.sat_writing_avg_score.isDigitsOnly() }
+                        .sortedByDescending { it.sat_writing_avg_score },
+                    sortedBy = SortingOption.WRITING_SCORE
+                )
+            }
+        }
+    }
+
+
     fun resetError() {
         _uiState.update {
             it.copy(
@@ -82,5 +124,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 }
+
 
 

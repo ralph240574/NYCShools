@@ -50,6 +50,7 @@ fun NavGraph(
             Home(
                 uiState = uiState,
                 refreshSchools = homeViewModel::refreshSchools,
+                sortingBy = homeViewModel::sortBy,
                 navigateToDetails = NavigationActions(navController).navigateToDetails,
                 onDismissError = homeViewModel::resetError
             )

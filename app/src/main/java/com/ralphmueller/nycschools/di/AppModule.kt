@@ -60,7 +60,7 @@ object AppModule {
         val cacheSize = 4 * 1024 * 1024
 
         val cache = Cache(
-            File(context.getCacheDir(), "cache"),
+            File(context.cacheDir, "cache"),
             cacheSize.toLong()
         )
         val builder = OkHttpClient.Builder()
@@ -113,8 +113,8 @@ object AppModule {
         @Singleton
         @Provides
         fun provideSchoolRepository(
-            @AppModule.RemoteDataSource remoteDataSource: NYCSchoolsRemoteDataSource,
-            @AppModule.LocalDataSource localDataSource: NYCSchoolsLocalDataSource,
+            @RemoteDataSource remoteDataSource: NYCSchoolsRemoteDataSource,
+            @LocalDataSource localDataSource: NYCSchoolsLocalDataSource,
         ): SchoolRepo {
             return SchoolRepo(
                 remoteDataSource = remoteDataSource,
