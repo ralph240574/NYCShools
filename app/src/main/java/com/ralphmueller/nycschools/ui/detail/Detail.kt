@@ -1,5 +1,6 @@
 package com.ralphmueller.nycschools.ui.detail
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +16,10 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ralphmueller.nycschools.model.School
 import com.ralphmueller.nycschools.ui.home.school
 
 @Preview
@@ -42,7 +45,20 @@ fun Detail(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {/* Do Something*/ }) {
+                    val context = LocalContext.current
+                    IconButton(onClick = {
+
+                        val school = uiState.school
+                        if (school != null) {
+                            val sendIntent: Intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, getShareText(school))
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        }
+                    }) {
                         Icon(Icons.Filled.Share, null)
                     }
                 })
@@ -64,5 +80,13 @@ fun Detail(
             }
         }
     }
+}
+
+fun getShareText(school: School?): String {
+    if (school == null) {
+        return ""
+    }
+    return school.school_name + "\n"+ school.website +"\n" +school.school_email
+
 }
 

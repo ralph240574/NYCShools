@@ -1,5 +1,6 @@
 package com.ralphmueller.nycschools.ui.home
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -35,8 +36,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import com.ralphmueller.nycschools.model.School
 import kotlinx.coroutines.launch
 
@@ -71,7 +74,9 @@ fun Home(
                     IconButton(onClick = {/* Do Something*/ }) {
                         Icon(Icons.Filled.FilterList, null)
                     }
-                    IconButton(onClick = {/* Do Something*/ }) {
+                    IconButton(onClick = {
+
+                    }) {
                         Icon(Icons.Filled.Search, null)
                     }
                 })
