@@ -1,7 +1,7 @@
 package com.ralphmueller.nycschools.model
 
 /*
-This class represent all the school data, which is used on the device it contains the SAT
+This class represent all the school data, which is used for the UI on the device it contains the SAT
 scores as well
  */
 data class School(

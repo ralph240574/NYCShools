@@ -4,6 +4,8 @@ package com.ralphmueller.nycschools.data.local
 import androidx.room.Entity
 import com.ralphmueller.nycschools.model.School
 
+/*This class repesents the school data  that is stored with room
+*/
 @Entity(tableName = "localschool", primaryKeys = ["dbn"])
 data class LocalSchool(
     val dbn: String,

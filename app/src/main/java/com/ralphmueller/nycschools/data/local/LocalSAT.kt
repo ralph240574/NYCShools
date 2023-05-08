@@ -3,6 +3,9 @@ package com.ralphmueller.nycschools.data.local
 
 import androidx.room.Entity
 
+/*
+ This class repesents the sat scores that is stored with room
+ */
 @Entity(tableName = "localsat", primaryKeys = ["dbn"])
 data class LocalSAT(
     val dbn: String,

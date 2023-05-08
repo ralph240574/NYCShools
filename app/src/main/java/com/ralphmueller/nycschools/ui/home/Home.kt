@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
@@ -39,19 +38,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ralphmueller.nycschools.model.School
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 const val SCHOOL_LIST = "SchoolList"
 
@@ -67,7 +60,7 @@ fun Home(
 ) {
     val scaffoldState = rememberScaffoldState()
     val refreshScope = rememberCoroutineScope()
-    var refreshing by remember { mutableStateOf(false) }
+    var refreshing by remember { mutableStateOf(true) }
 
     fun refresh() = refreshScope.launch {
         refreshing = true
@@ -119,13 +112,12 @@ fun Home(
                     .padding(paddingValues = padding)
                     .testTag(SCHOOL_LIST)
             ) {
-                if (!refreshing) {
-                    items(uiState.schools) { school ->
-                        ListItem(
-                            school = school,
-                            onClick = { navigateToDetails(school.dbn) }
-                        )
-                    }
+                items(uiState.schools) { school ->
+                    ListItem(
+                        school = school,
+                        onClick = { navigateToDetails(school.dbn) }
+                    )
+                    refreshing = false
                 }
             }
             PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
@@ -162,16 +154,11 @@ fun ListItem(
             .selectable(selected = true, onClick = onClick)
             .padding(10.dp)
     ) {
-        Text(text = school.school_name)
-        Text(text = school.location)
-        HyperlinkText(
-            fullText = school.website,
-            linkText = listOf(school.website),
-            hyperlinks = listOf("https://" + school.website)
+        Text(
+            text = school.school_name, fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
         )
-        Text(text = school.sat_critical_reading_avg_score)
-        Text(text = school.sat_writing_avg_score)
-        Text(text = school.sat_math_avg_score)
+        Text(text = school.location)
     }
 }
 
@@ -223,67 +210,6 @@ fun SortingOptions(sortingBy: (SortingOption) -> Unit, lastSorting: SortingOptio
     }
 }
 
-@Composable
-fun HyperlinkText(
-    modifier: Modifier = Modifier,
-    fullText: String,
-    linkText: List<String>,
-    linkTextColor: Color = Color.Blue,
-    linkTextFontWeight: FontWeight = FontWeight.Medium,
-    linkTextDecoration: TextDecoration = TextDecoration.Underline,
-    hyperlinks: List<String> = listOf(),
-    fontSize: TextUnit = TextUnit.Unspecified
-) {
-    val annotatedString = buildAnnotatedString {
-        append(fullText)
-        linkText.forEachIndexed { index, link ->
-            val startIndex = fullText.indexOf(link)
-            val endIndex = startIndex + link.length
-            addStyle(
-                style = SpanStyle(
-                    color = linkTextColor,
-                    fontSize = fontSize,
-                    fontWeight = linkTextFontWeight,
-                    textDecoration = linkTextDecoration
-                ),
-                start = startIndex,
-                end = endIndex
-            )
-            addStringAnnotation(
-                tag = "URL",
-                annotation = hyperlinks[index],
-                start = startIndex,
-                end = endIndex
-            )
-        }
-        addStyle(
-            style = SpanStyle(
-                fontSize = fontSize
-            ),
-            start = 0,
-            end = fullText.length
-        )
-    }
-
-    val uriHandler = LocalUriHandler.current
-
-    ClickableText(
-        modifier = modifier,
-        text = annotatedString,
-        onClick = {
-            try {
-                annotatedString
-                    .getStringAnnotations("URL", it, it)
-                    .firstOrNull()?.let { stringAnnotation ->
-                        uriHandler.openUri(stringAnnotation.item)
-                    }
-            } catch (ex: Exception) {
-                Timber.e(ex)
-            }
-        }
-    )
-}
-
 val school = School(
     dbn = "12345",
     school_name = "Clinton School Writers & Artists, M.S. 260",
@@ -293,7 +219,7 @@ val school = School(
     school_email = "admissions@theclintonschool.net",
     website = "www.theclintonschool.net",
     num_of_sat_test_takers = "123",
-    sat_critical_reading_avg_score = "50",
-    sat_math_avg_score = "100",
-    sat_writing_avg_score = "80"
+    sat_critical_reading_avg_score = "300",
+    sat_math_avg_score = "300",
+    sat_writing_avg_score = "300"
 )
