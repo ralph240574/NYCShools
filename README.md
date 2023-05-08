@@ -1,4 +1,4 @@
-# 20220505-RalphMueller-NYCSchools
+# NYCSchools
 
 ## Build Setup
 
